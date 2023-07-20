@@ -93,14 +93,18 @@ int GPSClass::available() {
 
         _gps_lat = lat_deg + (lat_min / 60.0) * (ns == 'N' ? 1.0 : -1.0);
         _gps_lng = lng_deg + (lng_min / 60.0) * (we == 'E' ? 1.0 : -1.0);
-        time.tm_year = time.tm_year + 2000;
-       // time.tm_year = (time.tm_year + 2000) - 1900;
-        _gps_timeUTC = mktime(&time);
+        
+       
         char _date[13];
         char _time[13];
-        sprintf(_date, "%4d-%02d-%02d",  time.tm_year , time.tm_mon, time.tm_mday);
+        sprintf(_date, "%4d-%02d-%02d",  time.tm_year+2000 , time.tm_mon, time.tm_mday);
         sprintf(_time, "%02d:%02d:%02d",  time.tm_hour, time.tm_min,time.tm_sec);
         _gps_datetime = String(_date) + "T" + String(_time) + "Z" ;
+
+	  time.tm_year = time.tm_year - 1900;
+	  time.tm_mon = time.tm_mon - 1;
+        _gps_timeUTC = mktime(&time);
+
         xEventGroupSetBits(_gps_flags, GPS_LOCATION_UPDATE_SUCCESS_FLAG);
     });
 
